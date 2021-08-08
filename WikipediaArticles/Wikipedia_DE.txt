@@ -1,0 +1,306 @@
+﻿{{Infobox Dateiformat
+| Dateiendung = .sml
+| Website = https://www.simpleml.com
+}}
+
+Die '''Simple Markup Language''' (dt. Einfache Auszeichnungssprache), abgekürzt '''SML''', ist ein [[Datenformat]] zur einfachen textuellen Beschreibung hierarchischer Daten. SML ist einfach und schnell von Hand zu schreiben, da es im Vergleich zu Formaten wie [[Extensible Markup Language|XML]] oder [[JSON]] nur eine reduzierte Anzahl an [[Sonderzeichen]] verwendet. Es unterstützt [[Kommentar (Programmierung)|Kommentare]] und ist dadurch vorallem für [[Konfigurationsdatei|Konfigurationsdateien]] geeignet. Durch die geringe Menge an Regeln, ist SML auch für Nicht-Experten leicht verständlich. SML Dateien erzielen durch die [[Minimalismus|minimalistische]] Schreibweise und der Option zur Minifikation besonders kleine Dateigrößen und bleiben trotz Minifikation weiterhin ohne spezielle Tools (wie [[Quelltextformatierung|Pretty Printer]]) lesbar.
+
+== Aufbau eines SML-Dokuments ==
+Ein SML-Dokument repräsentiert ein einfaches [[Hierarchisch strukturierte Daten|hierarchisches Objekt]], das aus zwei [[Knoten (Graphentheorie)|Knotentypen]] aufgebaut wird, Elementen und Attributen. Elemente dienen der Gruppierung und Attribute enthalten die eigentlichen Daten. Wie bei [[XML]] oder [[HTML]] beginnt ein Wurzelelement die Hierarchie. Das folgende Beispiel zeigt eine einfache [[Konfigurationsdatei]] eines [[Computerspiel|Computerspiels]]:<syntaxhighlight>
+Configuration
+  Video
+    Resolution 1280 720
+    RefreshRate 60
+    Fullscreen true
+  End
+  Audio
+    Volume 100
+    Music 80
+  End
+  Player
+    Name "Hero 123"
+  End
+End
+</syntaxhighlight>
+Das Wurzelelement <code>Configuration</code> gruppiert die drei Unterelemente <code>Video</code>, <code>Audio</code> und <code>Player</code>. Diese wiederum enthalten Attribute, die beispielsweise die Auflösung definieren (<code>Resolution 1280 720</code>) oder den Spielernamen festlegen (<code>Name "Hero 123"</code>). Attribute können einen oder mehrere Werte enthalten. Diese werden mit [[Whitespace (Informatik)|Whitespace]] getrennt hinter den Namen des Attributs geschrieben. SML-Dokumente sind zeilenbasiert und Elemente werden mit einem Endeschlüsselwort geschlossen, standardmäßig mit dem englischen Wort <code>End</code>.
+
+=== Kommentare ===
+Um eine Zeile auszukommentieren oder eine Anmerkung hinzuzufügen wird das Rautezeichen <code>#</code> vorangestellt.<syntaxhighlight>
+# Game.cfg
+Configuration
+  Video
+    Resolution 1920 1080  # or use 1280 720
+    
+    #RefreshRate 60
+    Fullscreen true
+  End
+End
+</syntaxhighlight>
+Kommentare können überall im Dokument platziert werden, als einzelne Zeile oder hinter Elementen und Attributen. Leere Zeilen sind erlaubt.
+
+=== Einrückung ===
+Zur [[Einrückungsstil|Einrückung]] können beliebige [[Unicode]] [[Leerraum|Whitespace-Zeichen]] verwendet werden. Die Anzahl oder Art spielt keine Rolle. Auch Werte von Attributen können mit unterschiedlichen und mehreren Whitespace-Zeichen von einander getrennt werden, um zum Beispiel Werte mehrerer Attribute gleichartig auszurichten.<syntaxhighlight>
+Configuration
+    Video
+        Resolution   1280  720
+        RefreshRate  60
+        Fullscreen   true
+    End
+End
+</syntaxhighlight>
+
+=== Werte ===
+Werte von SML-Attributen sind einfache Strings. Es findet keine Typenunterscheidung statt. Ein SML-Attribut ist somit ein benanntes [[Feld (Datentyp)|String-Array]], mit mindestens einem Wert. Enthält ein Wert Whitespace-Zeichen, doppelte Anführungszeichen, Rautezeichen oder zählt zu einen der Sonderfälle, muss der Wert in doppelten Anführungszeichen geschrieben werden.<syntaxhighlight>
+Werte
+  WertOhneLeerzeichen      HalloWelt
+  WertMitLeerzeichen       "Hallo Welt"
+  WertMitAnführungszeichen "Hallo ""Welt"""
+  WertMitRaute             "#Das ist kein Kommentar"
+  LeererString             ""
+  Null                     -
+  NurEinBindestrich        "-"
+  MehrzeiligerText         "Zeile 1"/"Zeile 2"
+End
+</syntaxhighlight>
+SML erlaubt die Unterscheidung zwischen leeren Strings und [[Nullwert|Nullwerten]]. Außerdem werden mehrzeilige Werte unterstützt. Das [[Zeilenvorschub|Zeilenvorschubzeichen LF]] wird hierbei durch die [[Escape-Sequenz]] <code>"/"</code> ersetzt. Alle Werte bleiben damit in einer Zeile und die Struktur bleibt trotz mehrzeiliger Werte erkennbar. Doppelte Anführungszeichen werden durch die Escape-Sequenz <code>""</code> dargestellt.
+
+Durch dieses minimalistische Regelwerk müssen die meistens Werte nicht in doppelten Anführungszeichen geschrieben werden, wie das folgendene Beispiel einer Windows-Dateiliste zeigt:<syntaxhighlight>
+RecentFiles
+  File IMG_0004.jpg
+  File c:\Misc\GreenBackground.png
+  File d:\Untitled.mp4
+  File c:\Photos\DSC_0366.jpg
+  File 20210104_163259.mp4
+  File "c:\My Files\Image - 001.png"
+End
+</syntaxhighlight>
+
+=== Element- und Attributnamen ===
+SML baut auf [[Unicode]] auf, weshalb Elemente und Attribute beliebig benannt werden können. Bezüglich der verwendbaren Zeichen gibt es keine Einschränkungen und es gelten die gleichen Schreibweiseregeln wie für Werte. Als einzige Einschränkung gilt, dass Element- und Attributsnamen nicht Null sein dürfen und das Elemente nicht den gleichen Namen wie das Endeschlüsselwort haben dürfen.<syntaxhighlight>
+"My Root Element"
+  "My First Attribute" 123
+End
+</syntaxhighlight>
+Eine wichtige Eigenschaft von SML ist, dass Element- und Attributnamen [[Case sensitivity|case-insensitve]] sind, das bedeutet unabhängig von [[Groß- und Kleinschreibung]]. Ein Element mit dem Namen <code>RoterApfel</code> ist also das gleiche wie <code>roterApfel</code> oder <code>ROTERAPFEL</code>. Das folgende SML-Dokument wäre also genauso eine gültige Konfigurationsdatei, wie im obigen Beispiel:<syntaxhighlight>
+CONFIGURATION
+  VIDEO
+    RESOLUTION 1280 720
+    REFRESHRATE 60
+    FULLSCREEN true
+  END
+END
+</syntaxhighlight>
+
+=== Reihenfolge ===
+SML-Elemente können mehrere Elemente und Attribute mit dem gleichen Namen enthalten. Je nach Anwendungsbereich kann die Reihenfolge eine Rolle spielen oder nicht. Im folgenden Beispiel einer [[Wiedergabeliste]] ist die Reihenfolge der gleichnamigen Attribute von Bedeutung:<syntaxhighlight>
+Tracks
+  Track Song1 /storage/sdcard0/Music/Song1.ogg
+  Track Song2 /storage/sdcard0/Music/Rock.ogg
+  Track Song3 https://www.example.com/Pop.ogg
+End
+</syntaxhighlight>
+
+=== Endeschlüsselwort ===
+SML-Dokumente können in beliebigen Sprachen geschrieben werden. Auch das Endeschlüsselwort kann angepasst werden, um eine sprachlich einheitliche Schreibweise zu erzielen. Das folgende Beispiel zeigt ein vollständig in [[Japanische Schrift|Japanisch]] geschriebenes SML-Dokument mit ersetztem Endeschlüsselwort:<syntaxhighlight>
+契約
+　　個人情報
+　　　　名字　田中
+　　　　名前　蓮
+　　エンド
+　　日付　２０２１－０１－０２
+エンド
+</syntaxhighlight>
+Ein SML-Parser springt in diesem Fall an das Ende des Dokuments und verwendet das letzte Wort als Endeschlüsselwort. Im folgenden deutschen Beispiel ist dies das <code>Ende</code> Wort:<syntaxhighlight>
+Vertragsdaten
+  Personendaten
+    Nachname Meier
+    Vorname Hans
+  Ende
+  Datum 2021-01-02
+Ende
+</syntaxhighlight>
+
+== Menschenfreundlichkeit ==
+Ein Ziel von SML ist es, ein Format zu bieten, dass leicht für [[Menschenlesbarkeit|Menschen]] lesbar ist, aber gleichzeitig auch für [[Maschinenlesbarkeit|Maschinen]]. Ein besonderer Wert wird hierbei auch auf die [[Robustheit]] gelegt, ohne dabei an Funktionalität einbüßen zu müssen. Dies geschieht wie folgt:
+
+# Durch die reduzierte Anzahl an Spezialzeichen und Sonderregeln ist das Format auch für Nicht-Programmierer leicht zugänglich.
+# Die Trennung mittels Leerzeichen und Tabs ist [[Intuition|intuitiv]].
+# Struktur wird nicht durch Einrückung erzeugt.
+# Kommentare sind möglich und einfach zu schreiben.
+# Namen von Elementen und Attributen sind case-insensitiv.
+# [[Mehrdeutigkeit|Mehrdeutigkeiten]] vermeiden und eindeutige Regeln bieten.
+
+Probleme wie ungültige abschließende Kommas oder fehlerhafte Einrückungen können mit SML nicht auftreten.
+
+SML ist durch seine Case-Insensitivität und die wenigen Sonderzeichen vorallem für [[Zehnfingersystem|Zehnfingerschreiber]] angenehm und schnell zu schreiben. Element- und Attributnamen können einfach klein geschrieben werden und die Finger dadurch entlastet werden, ohne dass dadurch Probleme mit der verarbeitenden [[Software]] entstehen.
+
+== Vergleich mit XML, JSON und YAML ==
+Folgendes Beispiel eines [[Geodaten]]-Formats soll zum Vergleich dienen:<syntaxhighlight>
+PointOfInterest
+  City      Seattle
+  Name      "Space Needle"
+  GpsCoords 47.6205 -122.3493
+  # Opening hours should go here
+End
+</syntaxhighlight>
+Das SML-Dokument stellt einen markanten [[Point of Interest|geografischen Punkt]] dar (in dem Fall die [[Space Needle]] in [[Seattle]]), der durch drei Attribute den Namen der Stadt, den Namen des Punktes und dessen [[GPS-Koordinaten]] beschreibt. Ein Kommentar wurde hinzugefügt, der andeutet, dass noch Öffnungszeiten hinzugefügt werden können.
+
+=== XML ===
+Mit XML können verschiedene Varianten definiert werden, um die selben Informationen darzustellen. Ob [[Element (Auszeichnungssprache)|Elemente]] mit InnerText verwendet werden oder [[Attribut (Auszeichnungssprache)|Attribute]] hängt oft von der Präferenz des Entwicklers ab.<syntaxhighlight lang="xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<PointOfInterest>
+  <City>Seattle</City>
+  <Name>Space Needle</Name>
+  <GpsCoords lat="47.6205" long="-122.3493"/>
+  <!-- Opening hours should go here -->
+</PointOfInterest>
+</syntaxhighlight>Im Vergleich zeigt sich, dass wesentlich mehr Sonderzeichen verwendet werden. Vorallem Kommentare sind aufwendiger zu schreiben (<code><!--</code> und <code>--></code> anstatt <code>#</code>) und es muss darauf geachtet werden, wo die Kommentare stehen, da sie nicht an allen Stellen erlaubt sind (z.B. Attribute auskommentieren).
+
+SML benötigt außerdem keine [[XML-Deklaration|Encoding- und Versionsdeklaration]].
+
+=== JSON ===
+Das selbe Beispiel mit JSON:<syntaxhighlight lang="json">
+{ "City":      "Seattle",
+  "Name":      "Space Needle",
+  "GpsCoords": [47.6205, -122.3493],
+  "_comment":  "Opening hours should go here" }
+</syntaxhighlight>JSON setzt zwingend voraus, dass die Schlüssel eines Objektes in doppelten Anführungszeichen geschrieben werden. JSON unterscheidet verschiedene Datentypen (Zahlen, [[Boolesche Variable|Boolsche Werte]], [[Zeichenkette|Zeichenketten]] und Nullwert) und nutzt zur Strukturierung Objekte und Arrays. String-Werte werden immer in Anführungszeichen geschrieben und für Sonderzeichen werden die in der [[C (Programmiersprache)|C]]-artigen Sprachenfamilie bekannten [[Escape-Sequenz|Escape-Sequenzen]] mit [[Backslash]] verwendet (<code>\"</code>, <code>\\</code>, <code>\n</code>, <code>\t</code>, ...).
+
+JSON kommt unter anderem für Konfigurationsformate zum Einsatz, erlaubt jedoch standardmäßig keine Kommentare. Als Workaround werden z.B. Schlüssel-Wert Paare verwendet, die aus einem Schlüssel mit beispielsweise führendem Unterstrich beginnen und der Kommentartext als String angegeben wird. Alternativ kann ein Präprozesser eingesetzt werden, der C-artige Kommentare (<code>//</code>, <code>/* */</code>) herausfiltert, bevor die JSON Datei geparsed wird. Dies sind jedoch keine standardisierten Verfahren.
+
+Objekte in JSON sind nicht benannt, wie das obige Beispiel zeigt. Erst ein Schlüssel-Wert Paar ordnet einem JSON Objekt einen Namen zu. Ein SML-Dokument im Gegensatz hat immer ein benanntes Wurzelelement, dass damit auch den Dokumenteninhalt klassifiziert (<code>PointOfInterest</code>) und als eine Art [[Magische Zahl (Informatik)|Formatbezeichner]] agiert.
+
+=== YAML ===
+
+Das selbe Beispiel in YAML:<syntaxhighlight lang="yaml">
+City:      Seattle
+Name:      Space Needle
+GpsCoords: [47.6205, -122.3493]
+# Opening hours should go here
+</syntaxhighlight>
+YAML bietet im Vergleich zu JSON eine wesentlich reduziertere Schreibweise, bei der auf die Verwendung von doppelten Anführungszeichen und geschweiften Klammern wenn möglich verzichtet wird. YAML erreicht dies durch eine Strukturierung die auf Einrückung basiert, ähnlich wie bei der Programmiersprache [[Python (Programmiersprache)|Python]]. YAML unterstützt im Gegensatz zu JSON Kommentare, die wie bei SML mit einer Raute <code>#</code> beginnen.
+
+Das Konzept der Einrückung ist bei einfachen Dokumenten leicht verständlich, kann jedoch bei komplexeren Dokumenten zu Problemen führen<ref>{{Internetquelle |url=https://www.arp242.net/yaml-config.html |titel=YAML: probably not so great after all |abruf=2021-08-08}}</ref>. Wer [[Tabulatorzeichen|Tabs]] zur Einrückung präferiert, muss in YAML zwingend Leerzeichen verwenden, da Tabs für die Einrückung nicht erlaubt sind<ref>{{Internetquelle |url=https://yaml.org/faq.html |titel=YAML Ain't Markup Language |abruf=2021-08-08}}</ref>. Da der führende Whitespace bei YAML signifikant ist, kann er außerdem nicht wie vergleichsweise bei JSON bei einer Minifikation entfernt werden.
+
+SML ist hier wesentliche flexibler. Tabs oder Leerzeichen können beliebig verwendet werden oder zur Einrückung im Zuge einer Minifikation ganz weggelassen werden.
+
+Die Grundkonzepte von YAML sind einfach. Jedoch besitzt YAML auch komplexere Konzepte, die in der 84-seitigen Spezifikation beschrieben werden<ref>{{Internetquelle |url=https://yaml.org/spec/1.2/spec.pdf |titel=YAML Ain’t Markup Language (YAML™) Version 1.2 3rd Edition, Patched at 2009-10-01 |abruf=2021-08-08}}</ref>. SML im Vergleich bietet ein wesentlich kürzeres Regelwerk.
+
+== Kodierung ==
+SML benötigt keine [[Zeichenkodierung|Encoding]]-Deklaration, wie sie beispielsweise bei XML oder HTML verwendet werden:<syntaxhighlight lang="html">
+<head>
+  <meta charset="UTF-8">
+</head> 
+</syntaxhighlight>Dies wird durch das Konzept erreicht, dass eine SML-Datei immer von einer kurzen Bytefolge angeführt wird, die das verwendete Encoding [[Eindeutigkeit|eindeutig]] identifiziert ([[Byte Order Mark]]). Durch dieses Konzept muss das Encoding nicht von einem [[Heuristik|Algorithmus erraten]] werden.
+
+Unterstützte Encodings sind [[UTF-8]], [[UTF-16]] ([[Big-endian|Big Endian]] und [[Little Endian]]), sowie [[UTF-32]] (Big Endian). Um die Korrektheit der Daten sicherzustellen, muss ein SML-Parser bei Nicht-Vorhandensein eines [[Byte Order Mark|BOM]]<nowiki/>s oder bei Auftreten einer ungültigen Encoding-Sequenz eine Fehlermeldung bringen.
+
+== Minifikation ==
+SML bietet wie JSON die Möglichkeit zur Minifikation. Hierbei werden nicht signifikanter Whitespace und Kommentare entfernt und das Endeschlüsselwort auf Null gesetzt. Das Konfigurationsbeispiel sieht minifiziert wie folgt aus:<syntaxhighlight>
+Configuration
+Video
+Resolution 1280 720
+RefreshRate 60
+Fullscreen true
+-
+Audio
+Volume 100
+Music 80
+-
+Player
+Name "Hero 123"
+-
+-
+</syntaxhighlight>
+Trotz Minifikation bleibt das SML-Dokument lesbar, da die Zeilenumbrüche erhalten bleiben. Da ein Zeilenumbruch nur durch ein Zeichen dargestellt wird, bringt dies im Vergleich zu JSON keine Nachteile, da auch hier mindestens ein Zeichen zur Trennung verwendet wird. Ein auf eine Zeile minifiziertes JSON-Dokument auf der anderen Seite, benötigt jedoch wieder Tools, um es besser lesbar darzustellen (Pretty Printer, TreeView Darstellung). 
+
+Mit zunehmender Verschachtelungstiefe erzielt SML gegenüber YAML weitere Größenvorteile, da die Einrückung nicht verpflichtend ist. 
+
+== Einsatzgebiete ==
+
+SML ist ein universelles Format und kann in den verschiedensten Bereichen eingesetzt werden. Einige Anwendungsbereiche können sein:
+
+* Konfigurationsformate
+* Make / Projektdateien
+* Manifest / Metadaten
+* 2D / 3D Grafikformate
+* UI Layout
+* Geodaten
+* Multimedia
+* Lokalisierung
+* etc.
+
+Mit SML sind nicht nur einfache Beispiele wie das folgende Rezept möglich, sondern auch beliebig komplexe Datenstrukturen.<syntaxhighlight>
+recipe
+  title "Bosten Baked Beans"
+  ingredients
+    ingredient 2 cups "navy beans" 
+    ingredient ½ pound bacon
+    ... ...
+  end
+  steps
+    step "Soak beans overnight in water"
+    ... ...
+  end
+end
+</syntaxhighlight>
+
+=== Tabellen in SML-Dokumenten ===
+Eine Stärke von SML ist die Verbindung von hierarchischen Datenstrukturen mit tabellarischen Daten:<syntaxhighlight>
+Tables
+  Table1
+    FirstName  LastName  Age  PlaceOfBirth
+    William    Smith     30   Boston
+    Olivia     Jones     27   Austin
+    Lucas      Brown     38   Chicago
+  End
+  Table2
+    City     State
+    Boston   Massachusetts
+    Austin   Texas
+    Chicago  Illinois
+  End
+End
+</syntaxhighlight>
+
+=== Kommunikation ===
+SML ist außerdem eine valide Option für die Client-Server-Kommunikation z.B. als Alternative zu XML und JSON für [[Ajax (Programmierung)|AJAX]]<ref>{{Internetquelle |url=https://www.youtube.com/watch?v=L1kbPcHmKjc |titel=SmlRequest - Asynchronous Client-Server Communication with JavaScript and SML (AJAS) |sprache=de-DE |abruf=2021-08-08}}</ref>. [[Remote Procedure Call|Remote Procedure Calls]] mit SML zu schreiben, anstatt in [[XML-RPC]] oder [[JSON-RPC]], fühlt sich natürlich an und profitiert von der geringen Größe von SML-Dokumenten (auch ohne [[Datenkompression|Kompression]]).<syntaxhighlight>
+methodCall
+  methodName examples.getStateName
+  params
+    param i4 40
+  end
+end
+</syntaxhighlight>
+
+== Programmiersprachen ==
+Für 5 der im [[TIOBE-Index]] gelisteten Top 10 Programmiersprachen (Stand August 2021) existieren bereits Bibliotheken mit offenem Quelltext:
+
+* [[Python (Programmiersprache)|Python]]
+* [[Java (Programmiersprache)|Java]]
+* [[C-Sharp|C#]]
+* [[JavaScript]]
+* [[PHP]]
+
+Die Referenzbibliotheken können leicht in andere Programmiersprachen portiert werden. Eine Portierung nach [[TypeScript]] ist verfügbar und es kommen stetig weitere Portierungen hinzu.
+
+== Alternative Formate ==
+
+* [[Java-Properties-Datei|.properties]] (Java-Properties-Datei)
+* [[Initialisierungsdatei|INI]] (Initialisierungsdatei)
+* [[JSON]] (JavaScript Object Notation)
+* [[Property List]]
+* [[TOML]] (Tom's Obvious, Minimal Language)
+* [[XML]] (Extensible Markup Language)
+* [[YAML]] (YAML Ain’t Markup Language)
+
+== Weblinks ==
+
+* [https://www.simpleml.com Offizielle Webseite]
+** [https://dev.stenway.com/SML/Specification.html SML-Spezifikation] (englisch)
+** [https://dev.stenway.com/SMLPlayground/Parse.html Online Parser] - Spielwiese mit ein- und ausklappbarer grafischer Darstellung des hierarchischen Objekts
+
+[[Kategorie:Datenformat]]
+[[Kategorie:Beschreibungssprache]]
+
+<references />
